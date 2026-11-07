@@ -190,6 +190,26 @@ class CinemaSoundEngine {
     }
   }
 
+  // Âm thanh phép màu mở Ấn Sáp Vàng phong cách Harry Potter (Celesta huyền ảo + tiếng nứt sáp mở thư):
+  // Đánh thức trình duyệt phát nhạc ngay khoảnh khắc người nhận chạm tay mở trang đầu tiên.
+  public playHogwartsSealOpen() {
+    this.playPaperOpen();
+
+    // Chuỗi quãng chuông Celesta huyền bí gợi không khí lâu đài ánh nến vàng (B4 -> E5 -> G5 -> F#5 -> E5 -> B5).
+    const celestaMotif: Array<[number, number, number, number]> = [
+      [493.88, 1.9, 0.075, 0.02], // B4
+      [659.25, 2.1, 0.085, 0.16], // E5
+      [783.99, 1.8, 0.08, 0.34],  // G5
+      [739.99, 1.9, 0.075, 0.48], // F#5
+      [659.25, 2.3, 0.085, 0.64], // E5
+      [987.77, 2.6, 0.07, 0.86],  // B5 ngân sáng lấp lánh
+    ];
+
+    celestaMotif.forEach(([freq, dur, vol, delay]) => {
+      this.playPianoNote(freq, dur, vol, delay);
+    });
+  }
+
   // Tiếng sột soạt mở phong bì giấy thủ công khi bấm "Mở thiệp".
   public playPaperOpen() {
     const ctx = this.ensureContext();

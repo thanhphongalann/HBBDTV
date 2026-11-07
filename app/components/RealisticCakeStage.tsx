@@ -212,7 +212,14 @@ void main() {
       float atlasU = centerAtlasU + localX * 0.215;
       float atlasV = 0.8073 - hNorm * 0.542;
 
-      vec3 flameSample = texture(uFlamesTex, vec2(atlasU, atlasV)).rgb;
+      // Mặt nạ làm mềm siêu mượt ở rìa vùng lấy mẫu để tuyệt đối không bao giờ lộ viền khung ảnh!
+      float spriteFeather = (1.0 - smoothstep(0.70, 0.95, abs(localX)))
+        * smoothstep(-0.21, -0.05, hNorm)
+        * (1.0 - smoothstep(1.10, 1.36, hNorm));
+
+      vec3 rawFlame = texture(uFlamesTex, vec2(atlasU, atlasV)).rgb;
+      // Khử hoàn toàn nhiễu nén JPEG cực tối (< 0.018) để nền ngoài ngọn lửa trong suốt 100%.
+      vec3 flameSample = max(vec3(0.0), rawFlame - vec3(0.018)) * (1.0 / 0.982) * spriteFeather;
       float flameStrength = smoothstep(0.0, 0.14, localP) * (0.88 + 0.22 * localP + uPeakGlow * 0.18);
 
       // Hòa trộn quang học kiểu Screen + cộng hưởng vùng lõi sáng để chồng lửa tự nhiên không cháy bệt.
@@ -529,13 +536,15 @@ export default function RealisticCakeStage({ onComplete }: RealisticCakeStagePro
             const scale = 0.25 + 0.8 * progressRef.current;
             const fw = cw * w.widthUV * 2.1 * scale;
             const fh = ch * w.heightUV * 1.75 * scale;
-            const sx = w.spriteIdx === 0 ? 0 : 256;
+            const halfAtlasW = flamesImg.naturalWidth * 0.5;
+            const fullAtlasH = flamesImg.naturalHeight;
+            const sx = w.spriteIdx === 0 ? 0 : halfAtlasW;
             fallback2dCtx.drawImage(
               flamesImg,
               sx,
               0,
-              256,
-              384,
+              halfAtlasW,
+              fullAtlasH,
               cw * w.u - fw * 0.5,
               ch * w.v - fh * 0.81,
               fw,

@@ -173,19 +173,19 @@ export default function HandwrittenLetterStage({
               strokeLinecap="round"
               transform="translate(1.6, 2.2)"
             />
-            {/* Thân dây thép mạ niken sáng bóng của chiếc kẹp giấy thật */}
+            {/* Thân dây đồng mạ vàng 24K sáng bóng của chiếc kẹp giấy thật hợp Mệnh Kim */}
             <path
               d="M9 14 V44 C9 49.5 19 49.5 19 44 V10 C19 4.5 6 4.5 6 11 V39"
-              stroke="url(#steelGrad)"
+              stroke="url(#brassGoldGrad)"
               strokeWidth="2.4"
               strokeLinecap="round"
             />
             <defs>
-              <linearGradient id="steelGrad" x1="4" y1="4" x2="22" y2="52" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stopColor="#f3efe9" />
-                <stop offset="45%" stopColor="#9e9690" />
-                <stop offset="78%" stopColor="#e5dfd8" />
-                <stop offset="100%" stopColor="#6f6762" />
+              <linearGradient id="brassGoldGrad" x1="4" y1="4" x2="22" y2="52" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#fff7df" />
+                <stop offset="45%" stopColor="#c6933c" />
+                <stop offset="78%" stopColor="#fce8b2" />
+                <stop offset="100%" stopColor="#7a5318" />
               </linearGradient>
             </defs>
           </svg>
@@ -237,7 +237,7 @@ export default function HandwrittenLetterStage({
           </div>
 
           <p className={`handwritten-signature ${isDoneWriting ? "visible" : ""}`}>
-            Thương mến, {sender} ♡
+            Thương mến, {sender} ✦
           </p>
         </article>
       </div>

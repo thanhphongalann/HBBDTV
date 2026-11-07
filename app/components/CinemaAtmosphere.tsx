@@ -3,14 +3,15 @@
 import { useEffect, useRef } from "react";
 
 // ============================================================================
-// LỚP KHÔNG GIAN ỐNG KÍNH MÁY ẢNH DSLR, BOKEH THẬT & CÁNH HOA 3 TẦNG TIÊU CỰ
+// LỚP KHÔNG GIAN ỐNG KÍNH MÁY ẢNH DSLR, BOKEH VÀNG KIM & CÁNH HOA HOÀNG KIM 3 TẦNG TIÊU CỰ
 // (CinemaAtmosphere.tsx)
-// Tái tạo cảm giác đang xem thước phim quay thật từ máy ảnh ống kính 50mm f/1.4:
+// Tái tạo cảm giác đang xem thước phim quay thật từ máy ảnh ống kính 50mm f/1.4
+// phối riêng tông Vàng Hoàng Kim - Sâm Panh - Bạch Kim cho người nhận Mệnh Kim:
 // - Lớp ảnh chụp thật các vòng tròn bokeh vàng ấm lơ lửng phía xa với nhịp máy thở nhẹ.
 // - Ở cảnh Bánh Kem phòng tối (darkroomMode), phông nền tự động hạ tối sâu như tắt đèn phòng
 //   để chiếc bánh kem chụp thật hòa quyện 100% không một gợn viền.
-// - Các cánh hoa hồng được dựng sẵn thành 3 tầng trường ảnh (tiền cảnh mờ bokeh sát ống kính,
-//   trung cảnh sắc nét thấy gân cánh hoa nhung, hậu cảnh mờ xa) rơi nghiêng xoay tự nhiên.
+// - Các cánh hoa hồng vàng sâm panh & lá nhũ vàng 24K được dựng thành 3 tầng trường ảnh
+//   (tiền cảnh mờ bokeh sát ống kính, trung cảnh sắc nét thấy gân cánh hoa ánh kim, hậu cảnh mờ xa).
 // ============================================================================
 
 interface CinemaAtmosphereProps {
@@ -46,7 +47,8 @@ interface DepthRosePetal {
   flipSpeed: number;
 }
 
-// Hàm tạo trước 3 tấm Sprite cánh hoa hồng nhung ở 3 mức độ lấy nét ống kính máy ảnh (DOF).
+// Hàm tạo trước 3 tấm Sprite cánh hoa Hoàng Kim / Vàng Sâm Panh ở 3 mức lấy nét ống kính (DOF)
+// hợp phong thủy Mệnh Kim (tuyệt đối không dùng sắc hồng).
 function buildOpticalPetalSprites(): HTMLCanvasElement[] {
   const blurLevels = [2.2, 0, 6.4]; // px độ nhòe quang học cho Hậu cảnh, Trung cảnh, Tiền cảnh
   return blurLevels.map((blurPx, idx) => {
@@ -62,7 +64,7 @@ function buildOpticalPetalSprites(): HTMLCanvasElement[] {
     }
     g.translate(48, 48);
 
-    // Hình dáng cánh hoa hồng thật hơi khum lòng thuyền và có khía mềm ở đầu cánh.
+    // Hình dáng cánh hoa trà / hồng vàng thật hơi khum lòng thuyền và có khía mềm ở đầu cánh.
     const r = 24;
     g.beginPath();
     g.moveTo(0, -r * 0.82);
@@ -72,28 +74,28 @@ function buildOpticalPetalSprites(): HTMLCanvasElement[] {
     g.bezierCurveTo(-r * 1.12, -r * 0.38, -r * 0.45, -r * 1.05, 0, -r * 0.82);
     g.closePath();
 
-    // Chuyển sắc nhung hồng trầm ấm dưới ánh đèn vàng phòng tối (không hồng neon giả tạo).
+    // Chuyển sắc Cánh Hoa Vàng Sâm Panh & Nhũ Hoàng Kim 24K dưới ánh nến ấm (chuẩn Mệnh Kim).
     const grad = g.createRadialGradient(-r * 0.22, -r * 0.25, r * 0.1, 0, r * 0.1, r * 1.18);
     if (idx === 1) {
-      grad.addColorStop(0, "rgba(246, 206, 212, 0.96)");
-      grad.addColorStop(0.48, "rgba(208, 126, 144, 0.94)");
-      grad.addColorStop(0.85, "rgba(142, 62, 82, 0.92)");
-      grad.addColorStop(1, "rgba(96, 36, 52, 0.88)");
+      grad.addColorStop(0, "rgba(255, 250, 228, 0.96)");
+      grad.addColorStop(0.46, "rgba(238, 196, 104, 0.94)");
+      grad.addColorStop(0.84, "rgba(182, 128, 42, 0.92)");
+      grad.addColorStop(1, "rgba(122, 80, 22, 0.88)");
     } else {
-      grad.addColorStop(0, "rgba(244, 198, 204, 0.85)");
-      grad.addColorStop(0.6, "rgba(192, 108, 128, 0.78)");
-      grad.addColorStop(1, "rgba(128, 52, 72, 0.68)");
+      grad.addColorStop(0, "rgba(255, 244, 212, 0.86)");
+      grad.addColorStop(0.6, "rgba(224, 176, 84, 0.78)");
+      grad.addColorStop(1, "rgba(154, 104, 32, 0.68)");
     }
     g.fillStyle = grad;
     g.fill();
 
-    // Với cánh hoa nằm đúng mặt phẳng lấy nét (idx === 1), vẽ thêm gân chính & viền bắt sáng.
+    // Với cánh hoa nằm đúng mặt phẳng lấy nét (idx === 1), vẽ thêm gân ánh kim & viền bắt sáng vàng 24K.
     if (idx === 1) {
-      g.strokeStyle = "rgba(255, 232, 224, 0.32)";
+      g.strokeStyle = "rgba(255, 246, 206, 0.42)";
       g.lineWidth = 0.9;
       g.stroke();
 
-      g.strokeStyle = "rgba(124, 48, 66, 0.28)";
+      g.strokeStyle = "rgba(146, 98, 28, 0.32)";
       g.lineWidth = 0.8;
       g.beginPath();
       g.moveTo(0, r * 0.9);

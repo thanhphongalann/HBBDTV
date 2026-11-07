@@ -399,21 +399,41 @@ export default function StarSkyFinale({
         <canvas ref={canvasRef} className="finale-star-canvas" aria-hidden="true" />
       )}
 
-      {/* NHỊP 1: Tấm thiệp mỹ thuật đen dập nhũ vàng kim (Hot-Foil Stamped Card) */}
+      {/* NHỊP 1: Tấm thiệp giấy mỹ thuật đen xé viền dập nhũ vàng kim (không viền khung CSS cứng) */}
       {phase === "card" && (
         <div className="ornate-final-stage stage-fade-in">
-          <div className="ornate-double-frame">
-            <span
-              className="ornate-card-grain"
-              style={{ backgroundImage: `url("${cardConfig.kraftPaperImage}")` }}
-              aria-hidden="true"
-            />
-            <span className="frame-corner corner-tl" aria-hidden="true" />
-            <span className="frame-corner corner-tr" aria-hidden="true" />
-            <span className="frame-corner corner-bl" aria-hidden="true" />
-            <span className="frame-corner corner-br" aria-hidden="true" />
+          <svg className="sr-svg-defs" aria-hidden="true">
+            <defs>
+              <filter id="finale-card-deckle" x="-4%" y="-4%" width="108%" height="108%">
+                <feTurbulence
+                  type="fractalNoise"
+                  baseFrequency="0.042"
+                  numOctaves="3"
+                  seed="23"
+                  result="cardNoise"
+                />
+                <feDisplacementMap
+                  in="SourceGraphic"
+                  in2="cardNoise"
+                  scale="4.0"
+                  xChannelSelector="R"
+                  yChannelSelector="G"
+                />
+              </filter>
+            </defs>
+          </svg>
 
-            <p className="ornate-top-label">DÀNH CHO {recipient.toUpperCase()}</p>
+          <div className="ornate-double-frame">
+            <span className="ornate-deckle-bg" aria-hidden="true">
+              <span
+                className="ornate-card-grain"
+                style={{ backgroundImage: `url("${cardConfig.kraftPaperImage}")` }}
+              />
+            </span>
+            <span className="ornate-foil-rule rule-top" aria-hidden="true" />
+            <span className="ornate-foil-rule rule-bottom" aria-hidden="true" />
+
+            <p className="ornate-top-label">✦ DÀNH CHO {recipient.toUpperCase()} ✦</p>
             <h1 className="ornate-main-greeting">
               Chúc Mừng Sinh Nhật, <em>{recipient}</em>
             </h1>
@@ -426,10 +446,11 @@ export default function StarSkyFinale({
                 type="text"
                 value={personalWish}
                 onChange={(e) => setPersonalWish(e.target.value)}
-                placeholder={`Viết thêm điều ước thầm kín của ${recipient} (tùy chọn)…`}
+                placeholder={`Viết thêm điều ước thầm kín của ${recipient} trên dòng nhũ vàng…`}
                 className="secret-wish-input"
                 maxLength={120}
               />
+              <span className="secret-wish-underline" aria-hidden="true" />
             </div>
           </div>
 
@@ -439,10 +460,12 @@ export default function StarSkyFinale({
               className="golden-amber-btn"
               onClick={handleTransformToStar}
             >
-              Gửi điều ước lên trời <span aria-hidden="true">✦</span>
+              <span>✦</span>
+              <span>Gửi điều ước hóa thành ngôi sao</span>
+              <span>✦</span>
             </button>
             <button type="button" className="restart-underline-btn" onClick={onRestart}>
-              Bắt đầu lại từ đầu
+              ↺ Xem lại tấm thiệp từ đầu
             </button>
           </div>
         </div>
@@ -483,8 +506,9 @@ export default function StarSkyFinale({
           <p className="sky-epilogue-copy">
             Mỗi khi ngước nhìn bầu trời đêm, hãy nhớ rằng luôn có những điều ấm áp nhất đang hướng về cậu. Chúc mừng sinh nhật nhé!
           </p>
-          <button type="button" className="cinema-pill-btn" onClick={onRestart}>
-            Xem lại tấm thiệp từ đầu <span aria-hidden="true">↺</span>
+          <button type="button" className="cinema-pill-btn golden-glow" onClick={onRestart}>
+            <span>Xem lại tấm thiệp từ đầu</span>
+            <span aria-hidden="true">↺</span>
           </button>
         </div>
       )}

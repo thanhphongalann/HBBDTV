@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { cardConfig, wishes, type WishItem } from "./card-config";
 import CinemaAtmosphere from "./components/CinemaAtmosphere";
 import DateWheelStage from "./components/DateWheelStage";
 import HandwrittenLetterStage from "./components/HandwrittenLetterStage";
 import HeartResultStage from "./components/HeartResultStage";
+import IntroStage from "./components/IntroStage";
 import RealisticCakeStage from "./components/RealisticCakeStage";
 import { soundEngine } from "./components/SoundEngine";
 import StarSkyFinale from "./components/StarSkyFinale";
@@ -13,18 +14,20 @@ import ThoughtsStage from "./components/ThoughtsStage";
 import WishEnvelopesStage from "./components/WishEnvelopesStage";
 
 // ============================================================================
-// TRANG ĐIỀU PHỐI CHÍNH CỦA THIỆP SINH NHẬT ĐIỆN ẢNH CHỤP THẬT (page.tsx)
-// Luồng trải nghiệm 7 phân cảnh liền mạch như một bộ phim tương tác quay bằng DSLR:
-// 1. dateWheel : Vừa mở link là hiện ngay Vòng Số Chạy Dọc Đến Ngày Sinh Nhật.
-// 2. cake      : Bánh kem dâu tây kem tươi chụp thật & 6 ngọn lửa nến nhấn giữ 3 giây.
-// 3. thoughts  : Từng câu tâm sự lấy nét quang học hiện rõ rồi tan mờ mượt mà (~16 giây).
-// 4. wishes    : 4 phong thư cổ niêm phong sáp thật (Công việc, Tình yêu, Sức khỏe, Tinh thần).
-// 5. result    : Lời chúc tương ứng + Trái tim 46 tấm ảnh in lụa + Album Polaroid 35mm.
-// 6. letter    : Tờ giấy sợi bông xé viền kẹp ảnh Polaroid + Mực viết tay hiện mượt 10 giây.
-// 7. finale    : Thiệp nhũ vàng -> Hóa thành 1 ngôi sao -> Chạm vào ngôi sao bay lên Ngân Hà.
+// TRANG ĐIỀU PHỐI CHÍNH CỦA THIỆP SINH NHẬT HOÀNG KIM — MỆNH KIM (page.tsx)
+// Luồng trải nghiệm 8 phân cảnh liền mạch như một bộ phim tương tác quay bằng DSLR:
+// 1. intro     : Mật thư Ấn Sáp Vàng 24K phong cách Harry Potter dưới ánh nến để kích hoạt nhạc.
+// 2. dateWheel : Vòng Số Chạy Dọc Đến Ngày Sinh Nhật trên nền bokeh vàng hoàng kim.
+// 3. cake      : Bánh kem chụp thật từ DSLR & 6 cây nến hoàng kim/bạch kim nhấn giữ 3 giây.
+// 4. thoughts  : Từng câu tâm sự lấy nét quang học hiện rõ rồi tan mờ mượt mà (~16 giây).
+// 5. wishes    : 4 phong thư cổ niêm phong Ấn Sáp Vàng (Công việc, Tình yêu, Sức khỏe, Tinh thần).
+// 6. result    : Lời chúc tương ứng + Trái tim 46 tấm ảnh tông vàng sâm panh + Album Polaroid 35mm.
+// 7. letter    : Tờ giấy sợi bông xé viền kẹp ghim đồng vàng + Mực viết tay hiện mượt 10 giây.
+// 8. finale    : Thiệp nhũ vàng 24K -> Hóa thành 1 ngôi sao -> Chạm vào ngôi sao bay lên Ngân Hà.
 // ============================================================================
 
 type CardStage =
+  | "intro"
   | "dateWheel"
   | "cake"
   | "thoughts"
@@ -39,8 +42,8 @@ function subscribeLocationSearch() {
 }
 
 export default function BirthdayCardPage() {
-  // Mở đường dẫn (link) là chạy thẳng ngay Vòng Số Dọc Đến Ngày Sinh Nhật ("dateWheel").
-  const [stage, setStage] = useState<CardStage>("dateWheel");
+  // Mở đường dẫn (link) sẽ hiện Trang Mở Đầu Ấn Sáp Vàng trước tiên để bật nhạc mượt mà.
+  const [stage, setStage] = useState<CardStage>("intro");
   const [runKey, setRunKey] = useState(0);
 
   // Đọc chuỗi truy vấn trên URL phía trình duyệt (ví dụ: ?to=Lan&from=Minh&day=17&month=7).
@@ -71,15 +74,17 @@ export default function BirthdayCardPage() {
     };
   }, [searchString]);
 
-  const [selectedWishId, setSelectedWishId] = useState<WishItem["id"]>("love");
-  const [soundPlaying, setSoundPlaying] = useState(true);
+  const [selectedWishId, setSelectedWishId] = useState<WishItem["id"]>("work");
+  const [soundPlaying, setSoundPlaying] = useState(false);
   const userMutedRef = useRef(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // Khởi chạy nhạc nền (file MP3 tùy chỉnh hoặc bản phối Piano & Hộp nhạc ấm áp).
+  // Khởi chạy nhạc nền (file MP3 tùy chỉnh hoặc bản phối Piano & Hộp nhạc ấm áp)
+  // ngay trong thao tác chạm mở ấn sáp của người nhận để trình duyệt cho phép phát 100%.
   const startBackgroundMusic = useCallback(() => {
     if (userMutedRef.current) return;
     soundEngine.setMuted(false);
+    setSoundPlaying(true);
 
     if (cardConfig.musicSrc && audioRef.current) {
       void audioRef.current.play().catch(() => {
@@ -90,23 +95,7 @@ export default function BirthdayCardPage() {
     }
   }, []);
 
-  // Bật nhạc ngay khi mở link; nếu trình duyệt chờ tương tác đầu tiên, tự mở khóa êm ái khi chạm.
-  useEffect(() => {
-    startBackgroundMusic();
-
-    const unlockOnFirstGesture = () => {
-      startBackgroundMusic();
-    };
-
-    window.addEventListener("pointerdown", unlockOnFirstGesture, { passive: true });
-    window.addEventListener("keydown", unlockOnFirstGesture);
-
-    return () => {
-      window.removeEventListener("pointerdown", unlockOnFirstGesture);
-      window.removeEventListener("keydown", unlockOnFirstGesture);
-    };
-  }, [startBackgroundMusic]);
-
+  // Nút bật/tắt âm thanh chủ động ở góc phải thanh điều hướng trên cùng.
   const handleToggleSound = () => {
     if (soundPlaying) {
       userMutedRef.current = true;
@@ -127,11 +116,11 @@ export default function BirthdayCardPage() {
     }
   };
 
-  // Đặt lại hành trình quay về ngay màn Vòng Số Chạy Dọc Đến Ngày Sinh Nhật.
+  // Đặt lại hành trình quay về Trang Mở Đầu Mật Thư Ấn Sáp Vàng (giữ nhạc nền tiếp tục ngân vang).
   const handleRestart = () => {
     soundEngine.stopCandleFlame();
     setRunKey((prev) => prev + 1);
-    setStage("dateWheel");
+    setStage("intro");
     if (!userMutedRef.current) {
       startBackgroundMusic();
     }
@@ -144,19 +133,19 @@ export default function BirthdayCardPage() {
 
   return (
     <main className="cinema-card-root" data-stage={stage}>
-      {/* Quầng sáng môi trường ấm áp cực dịu (tự tắt hoàn toàn ở cảnh bánh kem phòng tối) */}
+      {/* Quầng sáng môi trường Vàng Hoàng Kim ấm áp cực dịu (tự tắt hoàn toàn ở cảnh bánh kem phòng tối) */}
       <div className="cinema-ambient-glow glow-warm-key" aria-hidden="true" />
       <div className="cinema-ambient-glow glow-amber" aria-hidden="true" />
 
-      {/* Không gian ống kính DSLR 50mm f/1.4: ảnh bokeh thật + cánh hoa hồng 3 tầng tiêu cự */}
+      {/* Không gian ống kính DSLR 50mm f/1.4: ảnh bokeh thật + cánh hoa vàng sâm panh 3 tầng tiêu cự */}
       <CinemaAtmosphere
         enablePetals={enablePetals}
         darkroomMode={stage === "cake"}
-        subtleMode={stage === "finale"}
+        subtleMode={stage === "finale" || stage === "intro"}
         bokehPhotoUrl={cardConfig.cinemaBokehImage}
       />
 
-      {/* Thanh điều hướng tối giản phía trên */}
+      {/* Thanh điều hướng tối giản ánh vàng kim phía trên */}
       <header className="cinema-topbar">
         <span className="cinema-brand-mark">
           <i aria-hidden="true">✦</i> GỬI {recipient.toUpperCase()}
@@ -178,9 +167,20 @@ export default function BirthdayCardPage() {
         </button>
       </header>
 
-      {/* Khung sân khấu chính hiển thị từng phân cảnh */}
+      {/* Khung sân khấu chính hiển thị từng phân cảnh điện ảnh */}
       <section className="cinema-stage-container" aria-live="polite">
-        {/* MÀN 1 (HIỆN NGAY KHI MỞ LINK): Vòng số chạy dọc đến đúng ngày tháng sinh nhật */}
+        {/* MÀN MỞ ĐẦU: Mật thư Ấn Sáp Vàng 24K phong cách Harry Potter để bật nhạc & mở thiệp */}
+        {stage === "intro" && (
+          <IntroStage
+            key={`intro-${runKey}`}
+            recipient={recipient}
+            sender={sender}
+            onUnlockAudio={startBackgroundMusic}
+            onComplete={() => setStage("dateWheel")}
+          />
+        )}
+
+        {/* MÀN 2: Vòng số chạy dọc đến đúng ngày tháng sinh nhật */}
         {stage === "dateWheel" && (
           <DateWheelStage
             key={`wheel-${runKey}`}
@@ -190,7 +190,7 @@ export default function BirthdayCardPage() {
           />
         )}
 
-        {/* MÀN 2: Bánh kem chụp thật từ DSLR & 6 ngọn lửa nến nhấn giữ 3 giây */}
+        {/* MÀN 3: Bánh kem chụp thật từ DSLR & 6 ngọn lửa nến nhấn giữ 3 giây */}
         {stage === "cake" && (
           <RealisticCakeStage
             key={`cake-${runKey}`}
@@ -198,7 +198,7 @@ export default function BirthdayCardPage() {
           />
         )}
 
-        {/* MÀN 3: Từng câu tâm sự hiện rõ rồi tan mờ mượt mà */}
+        {/* MÀN 4: Từng câu tâm sự hiện rõ rồi tan mờ mượt mà */}
         {stage === "thoughts" && (
           <ThoughtsStage
             key={`thoughts-${runKey}`}
@@ -207,7 +207,7 @@ export default function BirthdayCardPage() {
           />
         )}
 
-        {/* MÀN 4: Bốn phong thư cổ niêm phong sáp thật */}
+        {/* MÀN 5: Bốn phong thư cổ niêm phong Ấn Sáp Vàng 24K */}
         {stage === "wishes" && (
           <WishEnvelopesStage
             wishes={wishes}
@@ -219,7 +219,7 @@ export default function BirthdayCardPage() {
           />
         )}
 
-        {/* MÀN 5: Lời chúc chi tiết + Trái tim ghép 46 tấm ảnh + Album Polaroid 35mm */}
+        {/* MÀN 6: Lời chúc chi tiết + Trái tim ghép 46 tấm ảnh ánh vàng + Album Polaroid 35mm */}
         {stage === "result" && (
           <HeartResultStage
             selectedWish={selectedWish}
@@ -231,7 +231,7 @@ export default function BirthdayCardPage() {
           />
         )}
 
-        {/* MÀN 6: Tờ giấy sợi bông xé viền kẹp ảnh Polaroid + Chữ viết tay 10 giây */}
+        {/* MÀN 7: Tờ giấy sợi bông xé viền kẹp ảnh Polaroid + Chữ viết tay 10 giây */}
         {stage === "letter" && (
           <HandwrittenLetterStage
             key={`letter-${runKey}`}
@@ -243,7 +243,7 @@ export default function BirthdayCardPage() {
           />
         )}
 
-        {/* MÀN 7: Khung thiệp cuối -> Hóa thành 1 ngôi sao -> Chạm sao bay vào dải Ngân Hà */}
+        {/* MÀN 8: Khung thiệp nhũ vàng -> Hóa thành 1 ngôi sao -> Chạm sao bay vào dải Ngân Hà */}
         {stage === "finale" && (
           <StarSkyFinale
             key={`finale-${runKey}`}
