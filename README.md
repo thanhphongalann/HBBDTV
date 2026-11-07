@@ -23,3 +23,6 @@ Mở [`app/card-config.ts`](app/card-config.ts) và sửa:
 Ví dụ: chép ảnh vào `public/anh/ky-niem-1.jpg`, rồi thêm `"/anh/ky-niem-1.jpg"` vào `photos`. Chép nhạc vào `public/nhac-sinh-nhat.mp3`, rồi đặt `musicSrc` thành `"/nhac-sinh-nhat.mp3"`.
 
 Lời chúc cho công việc, tình yêu, sức khỏe và tinh thần cũng nằm trong `app/card-config.ts`, ở mảng `wishes`.
+
+
+Hiện Trang mẫu đã có hãy truy cập https://happybirthdayalann.vercel.app/ để xem :3

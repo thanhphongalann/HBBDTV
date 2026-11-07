@@ -2109,7 +2109,13 @@ input:focus-visible {
   z-index: 6;
   width: 100%;
   height: 100%;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.finale-star-canvas.is-active {
+  opacity: 1;
 }
 
 .ornate-final-stage {
@@ -2117,6 +2123,18 @@ input:focus-visible {
   z-index: 9;
   width: 100%;
   max-width: 500px;
+  transition:
+    opacity 0.82s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.92s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.82s ease;
+}
+
+/* Hiệu ứng tấm thiệp nhũ vàng tan hóa mượt thành bụi sáng khi kết tinh ngôi sao */
+.ornate-final-stage.is-dissolving {
+  opacity: 0;
+  transform: translateY(-22px) scale(0.9);
+  filter: blur(12px) brightness(1.55);
+  pointer-events: none;
 }
 
 /* Tấm thiệp giấy mỹ thuật đen sợi bông xé viền thủ công dập chỉ nhũ vàng 24K (không khung viền hộp CSS cứng) */
@@ -2369,10 +2387,10 @@ input:focus-visible {
 
 .interactive-star-hitbox {
   position: fixed;
-  top: 48%;
+  top: 44%;
   left: 50%;
-  width: 164px;
-  height: 164px;
+  width: 184px;
+  height: 184px;
   border: 0;
   border-radius: 50%;
   background: transparent;
@@ -2380,6 +2398,12 @@ input:focus-visible {
   cursor: pointer;
   pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
+}
+
+.interactive-star-hitbox:focus,
+.interactive-star-hitbox:focus-visible {
+  outline: none;
+  filter: none;
 }
 
 .star-touch-prompt {
